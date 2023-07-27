@@ -40,14 +40,14 @@ def connect_with_backoff(connection):
         except pymysql.err.InternalError as e:
              warnings.append('Could not set session.net_read_timeout. Error: ({}) {}'.format(*e.args))
 
-
+        # DP: Added to fix "Lock wait timeout exceeded; try restarting transaction" error
         try:
             cur.execute('SET @@session.innodb_lock_wait_timeout=2700')
         except pymysql.err.InternalError as e:
             warnings.append(
                 'Could not set session.innodb_lock_wait_timeout. Error: ({}) {}'.format(*e.args)
                 )
-
+        ########################################################################################
         if warnings:
             LOGGER.info(("Encountered non-fatal errors when configuring MySQL session that could "
                          "impact performance:"))
@@ -89,7 +89,8 @@ class MySQLConnection(pymysql.connections.Connection):
             "password": config["password"],
             "host": config["host"],
             "port": int(config["port"]),
-            "cursorclass": config.get("cursorclass") or pymysql.cursors.SSCursor,
+            # DP: aurora sql doesn't work with this stuff
+            # "cursorclass": config.get("cursorclass") or pymysql.cursors.SSCursor,
             "connect_timeout": CONNECT_TIMEOUT_SECONDS,
             "read_timeout": READ_TIMEOUT_SECONDS,
             "charset": "utf8",
