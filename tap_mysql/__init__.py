@@ -468,7 +468,7 @@ def get_non_binlog_streams(mysql_conn, catalog, config, state):
     if currently_syncing:
         currently_syncing_stream = list(filter(
             lambda s: s.tap_stream_id == currently_syncing and is_valid_currently_syncing_stream(s, state),
-            streams_with_state))
+            ordered_streams))
 
         non_currently_syncing_streams = list(filter(lambda s: s.tap_stream_id != currently_syncing, ordered_streams))
 
