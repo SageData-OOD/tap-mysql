@@ -48,12 +48,12 @@ def connect_with_backoff(connection):
                 'Could not set session.innodb_lock_wait_timeout. Error: ({}) {}'.format(*e.args)
                 )
             
-        try:
-            cur.execute(f'SET @@session.max_execution_time={READ_TIMEOUT_SECONDS * 1000}')
-        except pymysql.err.InternalError as e:
-            warnings.append(
-                'Could not set session.max_execution_time. Error: ({}) {}'.format(*e.args)
-                )
+        # try:
+        #     cur.execute(f'SET @@session.max_execution_time={READ_TIMEOUT_SECONDS * 1000}')
+        # except pymysql.err.InternalError as e:
+        #     warnings.append(
+        #         'Could not set session.max_execution_time. Error: ({}) {}'.format(*e.args)
+        #         )
         ########################################################################################
 
         if warnings:
