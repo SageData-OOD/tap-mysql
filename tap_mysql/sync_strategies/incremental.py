@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 # pylint: disable=duplicate-code,too-many-locals
 
+from datetime import timedelta
+
 import pendulum
 import singer
 from singer import metadata
 
-from tap_mysql.connection import connect_with_backoff, MySQLConnection
+from tap_mysql.connection import connect_with_backoff
 import tap_mysql.sync_strategies.common as common
 
 LOGGER = singer.get_logger()
@@ -59,7 +61,8 @@ def sync_table(mysql_conn, catalog_entry, state, columns, limit=None):
 
                 if replication_key_value is not None:
                     if catalog_entry.schema.properties[replication_key_metadata].format == 'date-time':
-                        replication_key_value = pendulum.parse(replication_key_value)
+                        # DP: subtracting 60 seconds to ensure we don't miss any records
+                        replication_key_value = pendulum.parse(replication_key_value) - timedelta(seconds=60)
 
                     select_sql += ' WHERE `{}` >= %(replication_key_value)s ORDER BY `{}` ASC'.format(
                         replication_key_metadata,
